@@ -5,7 +5,7 @@
 int main() {
     try {
         HuffmanCompressor compressor;
-        std::string input = "hello";
+        std::string input = "abbcccddddeeeeeffffffggggggghhhhhhhhiiiiiiiiijjjjjjjjjj";
         
         // Compress
         CompressedData compressed = compressor.compress(input);

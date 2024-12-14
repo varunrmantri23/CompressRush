@@ -30,6 +30,8 @@ private:
         bool isLeaf() const { return !left && !right; }
     };
 
+
+    void printTree(Node* root, std::string prefix, bool isLeft);
     // Proper friend declaration cause issues with Node struct
     friend struct CompareNodes;
     std::map<char, std::vector<bool>> codes;  // stores binary codes for each char

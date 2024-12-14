@@ -1,6 +1,6 @@
 #include "huffman.hpp"
 #include <queue>
-
+#include <iostream>
 
 /*
 frequency table for "hello":
@@ -137,7 +137,6 @@ void HuffmanCompressor::generateCodes(Node* root, std::vector<bool>& code) {
 std::string HuffmanCompressor::decompress(const CompressedData& compressed) {
     if (compressed.data.empty()) return "";
     
-    //trying to build huffman table with frequency table
     auto root = buildHuffmanTree(compressed.freqTable);
     if (!root) return "";
     
@@ -145,22 +144,46 @@ std::string HuffmanCompressor::decompress(const CompressedData& compressed) {
     Node* current = root.get();
     size_t bitCount = 0;
     
+    // Print initial tree
+    std::cout << "\nHuffman Tree Structure:\n";
+    printTree(root.get(), "", true);
+    std::cout << "\nDecoding Process:\n";
     
     for (uint8_t byte : compressed.data) {
         for (int i = 7; i >= 0 && bitCount < compressed.validBits; --i) {
             bool bit = (byte >> i) & 1;
             bitCount++;
             
-            //navigate tree to find character and corresponding bit sequence
+            // Print path taken
+            std::cout << "Bit: " << bit << " -> ";
             current = bit ? current->right.get() : current->left.get();
             
-            // Found a leaf node (character)
             if (!current->left && !current->right) {
+                std::cout << "Found: '" << current->data << "'\n";
                 result += current->data;
                 current = root.get();
+            } else {
+                std::cout << "Internal node (freq: " << current->frequency << ")\n";
             }
         }
     }
     
     return result;
+}
+
+// Add this helper function to HuffmanCompressor class
+void HuffmanCompressor::printTree(Node* root, std::string prefix, bool isLeft) {
+    if (!root) return;
+    
+    std::cout << prefix;
+    std::cout << (isLeft ? "├──" : "└──");
+    
+    if (root->isLeaf()) {
+        std::cout << "'" << root->data << "' (" << root->frequency << ")\n";
+    } else {
+        std::cout << "(" << root->frequency << ")\n";
+    }
+    
+    printTree(root->left.get(), prefix + (isLeft ? "│   " : "    "), true);
+    printTree(root->right.get(), prefix + (isLeft ? "│   " : "    "), false);
 }
