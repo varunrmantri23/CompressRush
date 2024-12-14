@@ -1,0 +1,21 @@
+# Build directory
+build/
+
+# VS Code settings
+.vscode/
+
+# CLion settings
+.idea/
+
+# Compiled files
+*.o
+*.a
+*.out
+
+# Dependency directories
+lib/
+deps/
+
+# System files
+.DS_Store
+Thumbs.db
