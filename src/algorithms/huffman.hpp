@@ -7,8 +7,8 @@
 
 struct CompressedData {
     std::vector<uint8_t> data;
-    size_t validBits;  // Changed from uint8_t padding
-    std::map<char, int> freqTable;  // Changed back to int for consistency
+    size_t validBits;  
+    std::map<char, int> freqTable;  
 };
 
 // Forward declare CompareNodes
@@ -30,10 +30,10 @@ private:
         bool isLeaf() const { return !left && !right; }
     };
 
-    // Proper friend declaration
+    // Proper friend declaration cause issues with Node struct
     friend struct CompareNodes;
-    std::map<char, std::vector<bool>> codes;
-    std::map<char, int> frequency;
+    std::map<char, std::vector<bool>> codes;  // stores binary codes for each char
+    std::map<char, int> frequency;  // tracks char frequencies
     
     void buildFrequencyTable(const std::string& input);
     std::unique_ptr<Node> buildHuffmanTree(const std::map<char, int>& freq);
@@ -41,7 +41,7 @@ private:
     std::vector<uint8_t> packBits(const std::vector<bool>& bits, size_t& validBits);
 };
 
-// Define CompareNodes after HuffmanCompressor
+// sorts nodes by frequency for building optimal tree
 struct CompareNodes {
     bool operator()(const std::unique_ptr<HuffmanCompressor::Node>& a, 
                    const std::unique_ptr<HuffmanCompressor::Node>& b) const {

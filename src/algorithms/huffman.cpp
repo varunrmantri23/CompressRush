@@ -1,6 +1,47 @@
-// huffman.cpp
 #include "huffman.hpp"
 #include <queue>
+
+
+/*
+frequency table for "hello":
+h: 1
+e: 1
+l: 2
+o: 1
+total: 5 chars = 40 bits originally
+
+tree building steps:
+1. start with smallest frequencies:
+   h(1), e(1), o(1), l(2)
+
+2. build tree bottom-up:
+                (5)
+                / \
+               /   \
+             (3)   l(2)
+            /   \
+         h(1)   (2)
+                /  \
+              e(1) o(1)
+
+3. final codes:
+h: 00  (left, left)
+e: 010 (left, right, left)
+l: 1   (right)
+o: 011 (left, right, right)
+
+4. encoding "hello":
+h: 00
+e: 010
+l: 1
+l: 1
+o: 011
+
+initial bits: 01101000 01100101 01101100 01101100 01101111 (40 bits) -> used online string to bits converter
+final bits: 0010110011 (10 bits)
+saved 30 bits! (40 -> 10)
+although we also send the huffman table with it thus we send 10 bits + 8*4 + 9 bits ig which might not be actually compressed in this case but when sentences and examples are having repeated characters, it will be compressed
+*/
 
 void HuffmanCompressor::buildFrequencyTable(const std::string& input) {
     frequency.clear();
@@ -82,12 +123,12 @@ void HuffmanCompressor::generateCodes(Node* root, std::vector<bool>& code) {
         return;
     }
     
-    // Generate code for left subtree (add 0)
+    // generate code for left subtree (add 0)
     code.push_back(false);
     generateCodes(root->left.get(), code);
     code.pop_back();
     
-    // Generate code for right subtree (add 1)
+    // generate code for right subtree (add 1)
     code.push_back(true);
     generateCodes(root->right.get(), code);
     code.pop_back();
@@ -96,7 +137,7 @@ void HuffmanCompressor::generateCodes(Node* root, std::vector<bool>& code) {
 std::string HuffmanCompressor::decompress(const CompressedData& compressed) {
     if (compressed.data.empty()) return "";
     
-    // Rebuild Huffman tree using frequency table
+    //trying to build huffman table with frequency table
     auto root = buildHuffmanTree(compressed.freqTable);
     if (!root) return "";
     
@@ -104,14 +145,13 @@ std::string HuffmanCompressor::decompress(const CompressedData& compressed) {
     Node* current = root.get();
     size_t bitCount = 0;
     
-    // Process each byte
+    
     for (uint8_t byte : compressed.data) {
-        // Process each bit in the byte
         for (int i = 7; i >= 0 && bitCount < compressed.validBits; --i) {
             bool bit = (byte >> i) & 1;
             bitCount++;
             
-            // Navigate tree
+            //navigate tree to find character and corresponding bit sequence
             current = bit ? current->right.get() : current->left.get();
             
             // Found a leaf node (character)

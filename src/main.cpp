@@ -10,19 +10,17 @@ int main() {
         // Compress
         CompressedData compressed = compressor.compress(input);
         
-        // Calculate sizes
         size_t originalSize = input.size();
         size_t compressedSize = compressed.data.size();
-        double ratio = (double)compressedSize / originalSize * 100;
+        double ratio = (double)compressedSize / originalSize * 100; //compression ratio
         
-        // Print statistics
         std::cout << "Compression Statistics:\n";
         std::cout << "---------------------\n";
         std::cout << "Original size: " << originalSize << " bytes\n";
         std::cout << "Compressed size: " << compressedSize << " bytes\n";
         std::cout << "Compression ratio: " << std::fixed << std::setprecision(2) 
                   << ratio << "%\n";
-        std::cout << "Valid bits: " << compressed.validBits << "\n";
+        std::cout << "Valid bits: " << compressed.validBits << "\n"; 
         std::cout << "Frequency table size: " << compressed.freqTable.size() << "\n\n";
         
         // Decompress and verify
